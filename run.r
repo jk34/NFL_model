@@ -1,4 +1,3 @@
-setwd("/home/jerry/Desktop/NFL")
 library(data.table)
 library(rvest)
 library(stringr)
@@ -7,13 +6,13 @@ library(rJava)
 library(XLConnect)
 library(dplyr)
 library(reshape)
+library(glmnet)
 
 setwd("/home/jerry/Desktop/NFL/madden03")
 data.files = list.files()
-# Read the first file
-df02 = readWorksheetFromFile(file=data.files[1], sheet=1)
-# Loop through the remaining files and merge them to the existing data frame
-for (file in data.files[-1]) {
+df02 = data.frame()
+# Loop through the xlsx files and merge them to the existing data frame
+for (file in data.files) {
   newFile = readWorksheetFromFile(file=file, sheet=1)
   df02 = merge(df02, newFile, all=TRUE)
 }
@@ -358,15 +357,11 @@ Winpct15$Team[Winpct15$Team =="Francisco"] <- "49ers"
 
 #2002
 v1 <- unique(tr02$Position)
-tr02_trim <-Map(function(x,y)
-  filter(tr02, Position==x) %>%
-    group_by(tr02$Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
-  bind_rows()
 tr02_final <-Map(function(x,y)
   filter(tr02, Position==x) %>%
     group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
+    #top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
+    top_n(y, wt = Overall), v1, c(1, 1, 1, 1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)) %>% 
   bind_rows() %>%
   group_by(Team, Position) %>% summarise(Mean = mean(Overall))
 
@@ -374,15 +369,11 @@ tr02DF<-cast(tr02_final, Team~Position)
 
 #2003
 v1 <- unique(tr03$Position)
-tr03_trim <-Map(function(x,y)
-  filter(tr03, Position==x) %>%
-    group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
-  bind_rows()
 tr03_final <-Map(function(x,y)
   filter(tr03, Position==x) %>%
     group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
+    #top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
+    top_n(y, wt = Overall), v1, c(1, 1, 1, 1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)) %>% 
   bind_rows() %>%
   group_by(Team, Position) %>% summarise(Mean = mean(Overall))
 
@@ -390,15 +381,10 @@ tr03DF<-cast(tr03_final, Team~Position)
 
 #2004
 v1 <- unique(tr04$Position)
-tr04_trim <-Map(function(x,y)
-  filter(tr04, Position==x) %>%
-    group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
-  bind_rows()
 tr04_final <-Map(function(x,y)
   filter(tr04, Position==x) %>%
     group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
+    top_n(y, wt = Overall), v1, c(1, 1, 1, 1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)) %>% 
   bind_rows() %>%
   group_by(Team, Position) %>% summarise(Mean = mean(Overall))
 
@@ -406,15 +392,10 @@ tr04DF<-cast(tr04_final, Team~Position)
 
 #2005
 v1 <- unique(tr05$Position)
-tr05_trim <-Map(function(x,y)
-  filter(tr05, Position==x) %>%
-    group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
-  bind_rows()
 tr05_final <-Map(function(x,y)
   filter(tr05, Position==x) %>%
     group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
+    top_n(y, wt = Overall), v1, c(1, 1, 1, 1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)) %>% 
   bind_rows() %>%
   group_by(Team, Position) %>% summarise(Mean = mean(Overall))
 
@@ -422,15 +403,10 @@ tr05DF<-cast(tr05_final, Team~Position)
 
 #2006
 v1 <- unique(tr06$Position)
-tr06_trim <-Map(function(x,y)
-  filter(tr06, Position==x) %>%
-    group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
-  bind_rows()
 tr06_final <-Map(function(x,y)
   filter(tr06, Position==x) %>%
     group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
+    top_n(y, wt = Overall), v1, c(1, 1, 1, 1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)) %>% 
   bind_rows() %>%
   group_by(Team, Position) %>% summarise(Mean = mean(Overall))
 
@@ -438,15 +414,10 @@ tr06DF<-cast(tr06_final, Team~Position)
 
 #2007
 v1 <- unique(tr07$Position)
-tr07_trim <-Map(function(x,y)
-  filter(tr07, Position==x) %>%
-    group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
-  bind_rows()
 tr07_final <-Map(function(x,y)
   filter(tr07, Position==x) %>%
     group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
+    top_n(y, wt = Overall), v1, c(1, 1, 1, 1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)) %>% 
   bind_rows() %>%
   group_by(Team, Position) %>% summarise(Mean = mean(Overall))
 
@@ -455,15 +426,10 @@ tr07DF<-cast(tr07_final, Team~Position)
 
 #2008
 v1 <- unique(tr08$Position)
-tr08_trim <-Map(function(x,y)
-  filter(tr08, Position==x) %>%
-    group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
-  bind_rows()
 tr08_final <-Map(function(x,y)
   filter(tr08, Position==x) %>%
     group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
+    top_n(y, wt = Overall), v1, c(1, 1, 1, 1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)) %>% 
   bind_rows() %>%
   group_by(Team, Position) %>% summarise(Mean = mean(Overall))
 
@@ -471,15 +437,10 @@ tr08DF<-cast(tr08_final, Team~Position)
 
 #2009
 v1 <- unique(tr09$Position)
-tr09_trim <-Map(function(x,y)
-  filter(tr09, Position==x) %>%
-    group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
-  bind_rows()
 tr09_final <-Map(function(x,y)
   filter(tr09, Position==x) %>%
     group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
+    top_n(y, wt = Overall), v1, c(1, 1, 1, 1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)) %>% 
   bind_rows() %>%
   group_by(Team, Position) %>% summarise(Mean = mean(Overall))
 
@@ -488,15 +449,10 @@ tr09DF<-cast(tr09_final, Team~Position)
 
 #2010
 v1 <- unique(tr10$Position)
-tr10_trim <-Map(function(x,y)
-  filter(tr10, Position==x) %>%
-    group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
-  bind_rows()
 tr10_final <-Map(function(x,y)
   filter(tr10, Position==x) %>%
     group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
+    top_n(y, wt = Overall), v1, c(1, 1, 1, 1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)) %>% 
   bind_rows() %>%
   group_by(Team, Position) %>% summarise(Mean = mean(Overall))
 
@@ -506,15 +462,10 @@ tr10DF$FB[tr10DF$Team =="Vikings"] <- 83
 
 #2012
 v1 <- unique(tr12$Position)
-tr12_trim <-Map(function(x,y)
-  filter(tr12, Position==x) %>%
-    group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
-  bind_rows()
 tr12_final <-Map(function(x,y)
   filter(tr12, Position==x) %>%
     group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
+    top_n(y, wt = Overall), v1, c(1, 1, 1, 1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)) %>% 
   bind_rows() %>%
   group_by(Team, Position) %>% summarise(Mean = mean(Overall))
 
@@ -523,15 +474,10 @@ tr12DF<-cast(tr12_final, Team~Position)
 
 #2013
 v1 <- unique(tr13$Position)
-tr13_trim <-Map(function(x,y)
-  filter(tr13, Position==x) %>%
-    group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
-  bind_rows()
 tr13_final <-Map(function(x,y)
   filter(tr13, Position==x) %>%
     group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
+    top_n(y, wt = Overall), v1, c(1, 1, 1, 1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)) %>% 
   bind_rows() %>%
   group_by(Team, Position) %>% summarise(Mean = mean(Overall))
 
@@ -540,32 +486,21 @@ tr13DF<-cast(tr13_final, Team~Position)
 
 #2014
 v1 <- unique(tr14$Position)
-tr14_trim <-Map(function(x,y)
-  filter(tr14, Position==x) %>%
-    group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
-  bind_rows()
 tr14_final <-Map(function(x,y)
   filter(tr14, Position==x) %>%
     group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
+    top_n(y, wt = Overall), v1, c(1, 1, 1, 1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)) %>%  
   bind_rows() %>%
-    group_by(Team, Position) %>% summarise(Mean = mean(Overall))
+  group_by(Team, Position) %>% summarise(Mean = mean(Overall))
 
 tr14DF<-cast(tr14_final, Team~Position)
 
 #2015
 v1 <- unique(tr15$Position)
-tr15_trim <-Map(function(x,y)
-  filter(tr15, Position==x) %>%
-    group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
-    #2 CB, 2 DT, 2HB, 2MLB, 2WR
-  bind_rows()
 tr15_final <-Map(function(x,y)
   filter(tr15, Position==x) %>%
     group_by(Team) %>% 
-    top_n(y, wt = Overall), v1, c(1, 2, 2, 1, 1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2)) %>% 
+    top_n(y, wt = Overall), v1, c(1, 1, 1, 1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)) %>% 
   bind_rows() %>%
   group_by(Team, Position) %>% summarise(Mean = mean(Overall))
 
@@ -612,22 +547,13 @@ xmtest<-as.matrix(data.frame(xtest))
 r2 <- rSquared(trAll_test$Winpct, trAll_test$Winpct - predict(cv.lasso,s = "lambda.min", xmtest))
 mse <- mean((trAll_test$Winpct - predict(cv.lasso,s = "lambda.min", xmtest))^2)
 #nfolds=10, index<-sample(1:nrow(trAll), nrow(trAll)/5) gives 
-#r2=.0745, mse=.0341. 2nd try r2=.094, mse=.037
-#with coefs: C 8.5e-06, QB 3.63e-03, RE 5.02e-04, TE 8.24e-04
+#r2=.089, mse=.029
+#with coefs: QB 4.77e-03, RE 9.92e-05, TE 1.30e-03
 
 #nfolds=5, index<-sample(1:nrow(trAll), nrow(trAll)/5) gives 
-#r2=.0673, mse=.0344 for 1st try
-#running again, I get r2=.11, mse=.029 with coefs:
-#C 2.846757e-05, LT -1.059586e-04, QB 4.082625e-03, RE 1.124325e-03, RT 5.511895e-04,
-#SS 8.988904e-04, TE 1.303051e-03
-
-#nfolds=20, index<-sample(1:nrow(trAll), nrow(trAll)/5) gives 
-#r2=.07, mse=.0343
-#nfolds=10, index<-sample(1:nrow(trAll), nrow(trAll)/10) gives 
-#r2=-.129, mse=.0389
-#nfolds=10, index<-sample(1:nrow(trAll), nrow(trAll)/3) gives 
-#r2=.053, mse=.0373
-
+#r2=.093, mse=.0324 
+#with coefs:
+#QB .0043, TE 2.9e-04
 
 #random forest
 library(randomForest)
@@ -642,12 +568,10 @@ cols<-c('C', 'CB', 'DT', 'FB', 'FS', 'HB', 'K', 'LE', 'LG', 'LOLB',
 trAll_testX <- subset(trAll_test, select = -c(Winpct, Team) )
 r2 <- rSquared(trAll_test$Winpct, trAll_test$Winpct - predict(fit.rf, trAll_testX))
 mse <- mean((trAll_test$Winpct - predict(fit.rf, trAll_testX))^2)
-#ntree=50 => r2=-.044, mse=.034 on 1st try. r2=-.006, mse=.033 on 2nd try
-#ntree=20 => r2=-.047, mse=.034 on 1st try. r2=-.08, mse=.035 on 2nd try
-#ntree=100 => r2=-.02, mse=.033 on 1st try
-#ntree=5 => r2=-.23, mse=.040 on 1st try
-#ntree=500 => r2=.011, mse=.032 on 1st try. r2=.009, mse=.032 on 2nd try
-#ntree=1000 => r2=.0026, mse=.0326 on 1st try
+#ntree=50 => r2=-.055, mse=.038
+#ntree=100 => r2=-.053, mse=.038
+#ntree=500 => r2=-.036, mse=.037
+#ntree=1000 => r2=-.056, mse=.0378
 
 imp <- data.frame(MDA = sort(fit.rf$importance[,1], decreasing=T) )
 imp <- data.frame( Stat = rownames(imp)[1:21], MDA = imp$MDA[1:21])
@@ -659,4 +583,4 @@ ggplot( imp, aes(x = Stat, y = MDA, fill = Stat)) + geom_bar(stat = "identity") 
 ggsave( filename = "importance.png")
 
 
-#both Lasso and Random Forest choose RE, TE, SS, QB
+#both Lasso and Random Forest choose RE, TE, QB
