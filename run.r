@@ -548,13 +548,13 @@ xmtest<-as.matrix(data.frame(xtest))
 r2 <- rSquared(trAll_test$Winpct, trAll_test$Winpct - predict(cv.lasso,s = "lambda.min", xmtest))
 mse <- mean((trAll_test$Winpct - predict(cv.lasso,s = "lambda.min", xmtest))^2)
 #nfolds=10, index<-sample(1:nrow(trAll), nrow(trAll)/5) gives 
-#r2=.089, mse=.029
-#with coefs: QB 4.77e-03, RE 9.92e-05, TE 1.30e-03
+#r2=.058, mse=.027
+#with coefs: CB: 8.35e-04, LE: 2.21e-05, QB 8.21e-03, SS 7.19e-04, TE 3.97e-04
 
 #nfolds=5, index<-sample(1:nrow(trAll), nrow(trAll)/5) gives 
-#r2=.093, mse=.0324 
+#r2=.12, mse=.0387 
 #with coefs:
-#QB .0043, TE 2.9e-04
+#C: .001, QB .007, TE .00028
 
 #random forest
 library(randomForest)
@@ -569,19 +569,19 @@ cols<-c('C', 'CB', 'DT', 'FB', 'FS', 'HB', 'K', 'LE', 'LG', 'LOLB',
 trAll_testX <- subset(trAll_test, select = -c(Winpct, Team) )
 r2 <- rSquared(trAll_test$Winpct, trAll_test$Winpct - predict(fit.rf, trAll_testX))
 mse <- mean((trAll_test$Winpct - predict(fit.rf, trAll_testX))^2)
-#ntree=50 => r2=-.055, mse=.038
-#ntree=100 => r2=-.053, mse=.038
-#ntree=500 => r2=-.036, mse=.037
-#ntree=1000 => r2=-.056, mse=.0378
+#ntree=50 => r2=.119, mse=.039
+#ntree=100 => r2=.086, mse=.040
+#ntree=500 => r2=.11, mse=.039
+#ntree=1000 => r2=.10,  mse=.039
 
 imp <- data.frame(MDA = sort(fit.rf$importance[,1], decreasing=T) )
 imp <- data.frame( Stat = rownames(imp)[1:21], MDA = imp$MDA[1:21])
 imp$Stat <- reorder(imp$Stat, -imp$MDA)
 ggplot( imp, aes(x = Stat, y = MDA, fill = Stat)) + geom_bar(stat = "identity") +
-  scale_y_continuous("IncNodePurity", breaks=seq(0,.1,length.out=6), labels=c("0%","2%","4%","6%","8%","10%")) +
+  scale_y_continuous("Variable Importance", breaks=seq(0,.1,length.out=6), labels=c("0%","2%","4%","6%","8%","10%")) +
   scale_x_discrete("Position") + 
   labs(legend.position = "none")
-ggsave( filename = "importance.png")
+ggsave( filename = "importance500trees-1.png")
 
 
-#both Lasso and Random Forest choose RE, TE, SS, QB
+#both Lasso and Random Forest choose LE, TE, QB
