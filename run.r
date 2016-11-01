@@ -10,9 +10,10 @@ library(glmnet)
 
 setwd("/home/jerry/Desktop/NFL/madden03")
 data.files = list.files()
-df02 = data.frame()
+# Read the first file
+df02 = readWorksheetFromFile(file=data.files[1], sheet=1)
 # Loop through the xlsx files and merge them to the existing data frame
-for (file in data.files) {
+for (file in data.files[-1]) {
   newFile = readWorksheetFromFile(file=file, sheet=1)
   df02 = merge(df02, newFile, all=TRUE)
 }
@@ -511,7 +512,7 @@ tr02merge<-merge(Winpct02,tr02DF)
 tr03merge<-merge(Winpct03,tr03DF)
 tr04merge<-merge(Winpct04,tr04DF)
 tr05merge<-merge(Winpct05,tr05DF)
-tr06merge<-merge(Winpct06,tr02DF)
+tr06merge<-merge(Winpct06,tr06DF)
 tr07merge<-merge(Winpct07,tr07DF)
 tr08merge<-merge(Winpct08,tr08DF)
 tr09merge<-merge(Winpct09,tr09DF)
@@ -583,4 +584,4 @@ ggplot( imp, aes(x = Stat, y = MDA, fill = Stat)) + geom_bar(stat = "identity") 
 ggsave( filename = "importance.png")
 
 
-#both Lasso and Random Forest choose RE, TE, QB
+#both Lasso and Random Forest choose RE, TE, SS, QB
